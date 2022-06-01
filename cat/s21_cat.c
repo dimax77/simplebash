@@ -1,25 +1,23 @@
 #include <stdio.h>
 #include <string.h>
 #define B 1
+#define N 2
 
 int printfile(char * s, int flags) {
     FILE * file;
     file = fopen(s, "r");
     int c = 0;
-    int line = 0;
-    if (flags & B) {
+    int line = 1;
         while((c = fgetc(file)) != EOF) {
             if (c != '\n') {
-                printf("%6u\t", line++);
-            printf("%c", c);
-            while(((c = fgetc(file)) != '\n') && c != EOF) {
-                putchar(c);
-                
-            }
-            }
+                if (flags & B || flags & N) printf("%6u\t", line++);
+                printf("%c", c);
+                while(((c = fgetc(file)) != '\n') && c != EOF) {
+                    putchar(c);
+                }
+            } else if (flags & N && !(flags & B)) printf("%6u\t", line++);
             putchar(c);
         }
-    }
     return 0;
 }
 
@@ -31,6 +29,9 @@ int parseflags(char * s [], int * flags) {
             while (s[1][i]) {
                 switch (s[1][i])
                 {
+                    case 'n':
+                    * flags |= N;
+                    break;
                     case 'b':
                     * flags |= B;
                     break;
