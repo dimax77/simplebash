@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <dirent.h>
 #define B 1
 #define N 2
 
@@ -23,7 +24,6 @@ int printfile(char * s, int flags) {
 
 int parseflags(char * s [], int * flags) {
     int i = 0;
-    printf("%c\n", s[1][i]);
         if (s[1][i] == '-') {
             i++;
             while (s[1][i]) {
@@ -47,23 +47,40 @@ int parseflags(char * s [], int * flags) {
 
 int s21_cat(int argc, char * argv[]) {
     int flags = 0;
+    int file_exists = 0;
     if(argc < 2) {
         printf("Too few args.. abort.\n");
         return 0;
     }
-    int n = 0;
     int elements = 1;
     char * filename = NULL;
     for (;elements < argc; elements++){
+        printf("%s", argv[elements]);
         if(argv[elements][0] == '-') {
             flags = parseflags(argv, &flags);
         } else if (argv[elements][0] == '>') {
         } else if (argv[elements][0] == '<') {
         } else {
             filename = argv[elements];
-            printfile(filename, flags);
-            n++;
+            DIR *dir;
+            struct dirent *ent;
+            if ((dir = opendir("./")) != NULL) {
+                printf("Dir is Ok");
+                while ((ent = readdir(dir)) != NULL)
+                    if (!strcmp(ent->d_name, filename)) {
+                        file_exists = 1;
+                    }
+                    
+            }
+            if (file_exists) {
+                printfile(filename, flags);
+            } else {
+                printf("No such file\n");
+                break;
+            }
         }
+        
+        
     }
     return 0;
 }
