@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 #include <dirent.h>
 #define B 1
 #define N 2
+#define V 4
 
 int printfile(char * s, int flags) {
     FILE * file;
@@ -17,6 +19,7 @@ int printfile(char * s, int flags) {
                     putchar(c);
                 }
             } else if (flags & N && !(flags & B)) printf("%6u\t", line++);
+            if(flags & V) putchar('$');
             putchar(c);
         }
     return 0;
@@ -31,6 +34,9 @@ int parseflags(char * s [], int * flags) {
                 {
                     case 'n':
                     * flags |= N;
+                    break;
+                    case 'v':
+                    * flags |= V;
                     break;
                     case 'b':
                     * flags |= B;
@@ -55,7 +61,6 @@ int s21_cat(int argc, char * argv[]) {
     int elements = 1;
     char * filename = NULL;
     for (;elements < argc; elements++){
-        printf("%s", argv[elements]);
         if(argv[elements][0] == '-') {
             flags = parseflags(argv, &flags);
         } else if (argv[elements][0] == '>') {
@@ -65,7 +70,6 @@ int s21_cat(int argc, char * argv[]) {
             DIR *dir;
             struct dirent *ent;
             if ((dir = opendir("./")) != NULL) {
-                printf("Dir is Ok");
                 while ((ent = readdir(dir)) != NULL)
                     if (!strcmp(ent->d_name, filename)) {
                         file_exists = 1;
@@ -75,7 +79,7 @@ int s21_cat(int argc, char * argv[]) {
             if (file_exists) {
                 printfile(filename, flags);
             } else {
-                printf("No such file\n");
+                printf("%s: %s\n", filename, strerror(errno));
                 break;
             }
         }
