@@ -4,24 +4,43 @@
 #include <dirent.h>
 #define B 1
 #define N 2
-#define V 4
+#define E 4
+#define V 8
+#define T 16
 
+int putv(int * c, int flags) {  
+    if ((* c == 9) && !(flags & T)) {
+    }  else if (*c >= 0 && *c < 32) {       
+        putchar('^'); 
+        *c+=64;
+    } else if (*c == 127) {
+        putchar('^');
+        *c = '?';
+    }
+    return 0;
+}
 int printfile(char * s, int flags) {
     FILE * file;
     file = fopen(s, "r");
-    int c = 0;
-    int line = 1;
+    if (file != NULL) {
+        int c = 0;
+        int line = 1;
         while((c = fgetc(file)) != EOF) {
             if (c != '\n') {
                 if (flags & B || flags & N) printf("%6u\t", line++);
+                if (flags & V) putv(&c, flags);
                 printf("%c", c);
-                while(((c = fgetc(file)) != '\n') && c != EOF) {
+                while(((c = fgetc(file)) != '\n') && c != EOF) {                    
                     putchar(c);
                 }
             } else if (flags & N && !(flags & B)) printf("%6u\t", line++);
-            if(flags & V) putchar('$');
+            
+            if(flags & E) putchar('$');
             putchar(c);
         }
+    } else {
+        printf("%s: %s\n", s, strerror(errno));
+    }    
     return 0;
 }
 
@@ -35,8 +54,14 @@ int parseflags(char * s [], int * flags) {
                     case 'n':
                     * flags |= N;
                     break;
+                    case 't':
+                    * flags |= T;
+                    [[fallthrough]];
                     case 'v':
                     * flags |= V;
+                    break;
+                    case 'e':
+                    * flags |= E;
                     break;
                     case 'b':
                     * flags |= B;
@@ -53,7 +78,6 @@ int parseflags(char * s [], int * flags) {
 
 int s21_cat(int argc, char * argv[]) {
     int flags = 0;
-    int file_exists = 0;
     if(argc < 2) {
         printf("Too few args.. abort.\n");
         return 0;
@@ -67,21 +91,7 @@ int s21_cat(int argc, char * argv[]) {
         } else if (argv[elements][0] == '<') {
         } else {
             filename = argv[elements];
-            DIR *dir;
-            struct dirent *ent;
-            if ((dir = opendir("./")) != NULL) {
-                while ((ent = readdir(dir)) != NULL)
-                    if (!strcmp(ent->d_name, filename)) {
-                        file_exists = 1;
-                    }
-                    
-            }
-            if (file_exists) {
                 printfile(filename, flags);
-            } else {
-                printf("%s: %s\n", filename, strerror(errno));
-                break;
-            }
         }
         
         
