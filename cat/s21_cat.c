@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <dirent.h>
 #define B 1
 #define N 2
 #define E 4
 #define V 8
 #define T 16
+#define S 32
 
 int putv(int * c, int flags) {  
     if ((* c == 9) && !(flags & T)) {
@@ -54,14 +54,18 @@ int parseflags(char * s [], int * flags) {
                     case 'n':
                     * flags |= N;
                     break;
+                    case 's':
+                    * flags |= S;
+                    break;
                     case 't':
                     * flags |= T;
-                    [[fallthrough]];
+                    __attribute__ ((fallthrough));  // Fall Through
                     case 'v':
                     * flags |= V;
                     break;
                     case 'e':
                     * flags |= E;
+                    * flags |= V;
                     break;
                     case 'b':
                     * flags |= B;
