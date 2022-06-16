@@ -5,5 +5,6 @@ SOURCE=s21_cat.c
 all:
 
 mytest: s21_cat.c
-		$(CC) $(CFLAGS) -Dmytest -c $(SOURCE) -o $@
+		$(CC) $(CFLAGS) -Dmytest -o $@ s21_cat.c
+
 

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <check.h>
 #define B 1
 #define N 2
 #define E 4
@@ -98,6 +99,9 @@ int s21_cat(int argc, char * argv[]) {
                 printfile(filename, flags);
         }
         
+
+
+     
         
     }
     return 0;
